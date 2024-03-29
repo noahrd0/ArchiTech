@@ -1,0 +1,28 @@
+{
+  "name": "architech",
+  "version": "1.0.0",
+  "description": "projet annuel ipssi, mise en place d'une interface de gestion de fichiers clients",
+  "main": "server.js",
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noahrd0/ArchiTech.git"
+  },
+  "keywords": [
+    "Gestion",
+    "de",
+    "fichiers"
+  ],
+  "author": "n.radal l.develay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noahrd0/ArchiTech/issues"
+  },
+  "homepage": "https://github.com/noahrd0/ArchiTech#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
