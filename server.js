@@ -1,16 +1,14 @@
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
+const sequelize = require('./database/database');
 
-app.get('/', (req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.write('<h1>Hello World!</h1>');
-});
+const user = require('./routes/userRoute');
 
-app.get('/page1', (req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.write('<h1>Hello!</h1>');
-});
+app.use(express.json());
+
+app.use('/user', user);
 
 app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+    console.log('Server is running on port 3000 : http://localhost:3000');
+    sequelize.sync();
 });

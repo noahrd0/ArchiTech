@@ -23,6 +23,10 @@
   },
   "homepage": "https://github.com/noahrd0/ArchiTech#readme",
   "dependencies": {
-    "express": "^4.19.2"
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mariadb": "^3.3.0",
+    "mysql2": "^3.9.3",
+    "sequelize": "^6.37.1"
   }
 }
