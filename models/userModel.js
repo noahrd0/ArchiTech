@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database/database');
 
-const User = sequelize.define('User', {
+const user = sequelize.define('user', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -20,4 +20,4 @@ const User = sequelize.define('User', {
     freezeTableName: true,
 });
 
-module.exports = User;
+module.exports = user;
