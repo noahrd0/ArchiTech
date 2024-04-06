@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const sequelize = require('./database/database');
 
 const user = require('./routes/userRoute');
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/user', user);
