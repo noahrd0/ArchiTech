@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const mailService = require('../services/mailService');
 const bcrypt = require('bcrypt');
 
 exports.login = async (req, res) => {
@@ -28,6 +29,7 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);
         await User.create({ email: email, password: hash });
+        mailService.sendMail(email);
         return res.status(201).json({ success: true, message: 'Utilisateur créé.'});
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Une erreur est survenue lors de la création de l\'utilisateur.' });

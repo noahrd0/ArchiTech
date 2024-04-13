@@ -30,6 +30,7 @@
     "express": "^4.19.2",
     "mariadb": "^3.3.0",
     "mysql2": "^3.9.3",
+    "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
     "path": "^0.12.7",
     "sequelize": "^6.37.1"
