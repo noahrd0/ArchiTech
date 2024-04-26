@@ -1,5 +1,9 @@
 const File = require('../models/fileModel');
 
+exports.showUploadPage = function(req, res) {
+    res.render('file');
+};
+
 exports.uploadFile = async (req, res) => {
     try {
         if (!req.file || !req.file.buffer) {

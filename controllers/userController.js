@@ -2,6 +2,14 @@ const User = require('../models/userModel');
 const mailService = require('../services/mailService');
 const bcrypt = require('bcrypt');
 
+exports.showRegisterPage = function(req, res) {
+    res.render('register');
+};
+
+exports.showLoginPage = function(req, res) {
+    res.render('login');
+};
+
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;

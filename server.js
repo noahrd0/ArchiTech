@@ -21,6 +21,7 @@ const storage = multer.diskStorage({
   });
 const upload = multer({ storage });
 
+app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(cors());
 app.use(express.json());
@@ -33,7 +34,7 @@ app.post('/api/uploads', upload.single('file'), (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to the application.' });
+    res.render('index');
 });
 
 app.listen(3000, () => {
