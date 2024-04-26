@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const mailService = require('../services/mailService');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 exports.showRegisterPage = function(req, res) {
     res.render('register');
@@ -17,7 +18,10 @@ exports.login = async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json('Email ou mot de passe incorrect.');
         }
-        return res.status(200).json('Connexion réussie.');
+        // Générez le token JWT et renvoyez-le en réponse
+        const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "1h" });
+        // Envoie uniquement le token comme réponse
+        res.json({ token });
     } catch (error) {
         return res.status(500).json('Une erreur est survenue lors de la connexion.');
     }
@@ -36,9 +40,14 @@ exports.register = async (req, res) => {
         }
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);
+
         await User.create({ email: email, password: hash });
+
+        // Génération et envoie JWT Token
+        const token = jwt.sign({email}, process.env.SECRET_KEY ,{ expiresIn: '1h'})
+        res.json({token});
+
         mailService.sendMail(email);
-        return res.status(201).json({ success: true, message: 'Utilisateur créé.'});
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Une erreur est survenue lors de la création de l\'utilisateur.' });
     }

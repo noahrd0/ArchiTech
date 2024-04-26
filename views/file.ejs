@@ -7,15 +7,21 @@
 
     <script>
         document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+            // Récupere le token dans le local storage
+            const token = localStorage.getItem('token');
             event.preventDefault();
-            
+
             const formData = new FormData();
             formData.append('file', document.getElementById('fileInput').files[0]);
 
             try {
                 const response = await fetch('/files/upload', {
                     method: 'POST',
-                    body: formData
+                    body: formData ,
+                    // Autorisé le token dans le headers
+                    headers: {
+                        'Authorization': `${token}`
+                    }
                 });
 
                 if (response.ok) {
