@@ -1,6 +1,4 @@
 <%- include('partials/header') %>
-    <div id="alerts"></div>
-    
     <h2>Registration</h2>
 
     <form id="registerForm">
@@ -13,24 +11,12 @@
 
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function (event) {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-    try {
-        const registerResponse = await fetch('http://localhost:3000/user/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-
-        const registerData = await registerResponse.json();
-
-        if (registerData.token) {
             try {
-                const loginResponse = await fetch('http://localhost:3000/user/login', {
+                const registerResponse = await fetch('http://localhost:3000/user/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -38,23 +24,33 @@
                     body: JSON.stringify({ email, password }),
                 });
 
-                const loginData = await loginResponse.json();
+                const registerData = await registerResponse.json();
 
-                if (loginData.token) {
-                    localStorage.setItem('token', loginData.token);
-                    console.log('Register good');
+                if (registerData.token) {
+                    try {
+                        const loginResponse = await fetch('http://localhost:3000/user/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, password }),
+                        });
+
+                        const loginData = await loginResponse.json();
+
+                        if (loginData.token) {
+                            localStorage.setItem('token', loginData.token);
+                        }
+                        createAlert(loginData);
+                    } catch (error) {
+                        catchAlert();
+                    }
                 } else {
-                    console.error('Regsiter failed', loginData);
+                    createAlert(registerData);
                 }
             } catch (error) {
-                console.error('Error during login:', error);
+                catchAlert();
             }
-        } else {
-            console.error('Registration failed:', registerData);
-        }
-    } catch (error) {
-        console.error('Error during registration:', error);
-    }
-});
+        });
     </script>
 <%- include('partials/footer') %>

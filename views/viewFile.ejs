@@ -11,6 +11,7 @@
         // Vérifier si le token existe
         if (!token) {
             console.log('User not authenticated.');
+            createAlert({ message: 'Veuillez vous connecter pour accéder à cette page.', success: false });
             // Rediriger l'utilisateur vers la page de connexion ou afficher un message d'erreur
             return;
         }
@@ -40,10 +41,12 @@
                 });
             } else {
                 console.error('Error retrieving files:', response.statusText);
+                createAlert(response);
                 // Afficher un message d'erreur à l'utilisateur
             }
         } catch (error) {
             console.error('Error retrieving files:', error);
+            catchAlert();
             // Afficher un message d'erreur à l'utilisateur
         }
     });

@@ -14,16 +14,17 @@ exports.showLoginPage = function(req, res) {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(email, password);
         const user = await User.findOne({ where: { email: email } });
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json('Email ou mot de passe incorrect.');
+            return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.', success: false});
         }
         // Générez le token JWT et renvoyez-le en réponse
         const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "1h" });
         // Envoie uniquement le token comme réponse
-        res.json({ token });
+        res.json({token, message: 'Connexion réussie.', success: true});
     } catch (error) {
-        return res.status(500).json('Une erreur est survenue lors de la connexion.');
+        return res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.', success: false});
     }
 };
 
@@ -43,11 +44,11 @@ exports.register = async (req, res) => {
 
         await User.create({ email: email, password: hash });
 
+        mailService.sendMail(email);
+
         // Génération et envoie JWT Token
         const token = jwt.sign({email}, process.env.SECRET_KEY ,{ expiresIn: '1h'})
-        res.json({token});
-
-        mailService.sendMail(email);
+        res.json({token, message: 'Utilisateur créé avec succès.', success: true});
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Une erreur est survenue lors de la création de l\'utilisateur.' });
     }

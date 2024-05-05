@@ -15,7 +15,7 @@ exports.authenticator = async (req, res, next) => {
                 const user  = await User.findOne({ where: { email: decoded.email } });
 
                 if (!user) {
-                    return res.status(401).json('Pas autorisé');
+                    return res.status(401).json({ message: 'Créer un compte pour accéder à cette fonctionnalité.', success: false });
                 }
                 const userData = user.dataValues || user;
 
@@ -25,10 +25,10 @@ exports.authenticator = async (req, res, next) => {
                 next();
             }
         } catch (error) {
-            return res.status(401).json("Unauthorized: Invalid token");
+            return res.status(401).json({ message: 'Une erreur s\'est produite avec votre compte, reconnectez-vous', success: false });
         }
     } else {
-        return res.status(401).json("Unauthorized: Token not provided");
+        return res.status(401).json({ message: 'Créer un compte pour accéder à cette fonctionnalité.', success: false });
     }
 };
 
@@ -43,7 +43,7 @@ exports.showViewPage = function(req, res) {
 exports.uploadFile = async (req, res) => {
     try {
         if (!req.file || !req.file.buffer) {
-            return res.status(400).json({ message: 'No file uploaded.' });
+            return res.status(400).json({ message: 'Veuillez sélectionner un fichier à télécharger.', success: false });
         }
 
         const { originalname, buffer, mimetype } = req.file;
@@ -64,10 +64,10 @@ exports.uploadFile = async (req, res) => {
             uploadedBy: userId // Utiliser l'ID de l'utilisateur
         });
 
-        return res.status(200).json({ message: 'File uploaded successfully.', fileId: newFile.id });
+        return res.status(200).json({ fileId: newFile.id });
     } catch (error) {
         console.error('Error uploading file:', error);
-        return res.status(500).json({ message: 'An error occurred while uploading file.' });
+        return res.status(500).json({ message: 'Une erreur s\'est produite lors du téléchargement du fichier.', success: false });
     }
 };
 
@@ -86,7 +86,6 @@ exports.getUserFiles = async (req, res) => {
         // Renvoyer les fichiers trouvés
         return res.status(200).json({ userFiles: userFiles });
     } catch (error) {
-        console.error('Error retrieving user files:', error);
-        return res.status(500).json({ message: 'An error occurred while retrieving user files.' });
+        return res.status(500).json({ message: 'Une erreur s\'est produite lors de la récupération des fichiers de l\'utilisateur.', success: false});
     }
 };
