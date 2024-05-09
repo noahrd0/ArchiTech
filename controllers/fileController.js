@@ -32,19 +32,9 @@ exports.authenticator = async (req, res, next) => {
     }
 };
 
-exports.showUploadPage = function(req, res) {
-    res.render('file');
-};
-
-exports.showViewPage = function(req, res) {
-    res.render('viewFile');
-};
-
-exports.uploadFile = async (req, res) => {
+exports.fileAddPost = async (req, res) => {
     try {
-        if (!req.file || !req.file.buffer) {
-            return res.status(400).json({ message: 'Veuillez sélectionner un fichier à télécharger.', success: false });
-        }
+        console.log(req.file);
 
         const { originalname, buffer, mimetype } = req.file;
 
@@ -55,37 +45,74 @@ exports.uploadFile = async (req, res) => {
         const user = await User.findOne({ where: { email: userEmail } });
         const userId = user.id;
 
-
-        // Enregistrez le fichier en base de données
-        const newFile = await File.create({
+        // // Enregistrez le fichier en base de données
+        await File.create({
             filename: originalname,
             data: buffer,
             mimetype: mimetype,
-            uploadedBy: userId // Utiliser l'ID de l'utilisateur
+            uploadedBy: userId
         });
 
-        return res.status(200).json({ fileId: newFile.id });
+        // Rediriger avec un message de succès si l'opération s'est déroulée avec succès
+        req.session.message = {
+            type: 'success',
+            message: 'Fichier ajouté avec succès'
+        };
+        res.json({message: 'Connexion réussie.', success: true});
+        // res.redirect('/files');
     } catch (error) {
-        console.error('Error uploading file:', error);
-        return res.status(500).json({ message: 'Une erreur s\'est produite lors du téléchargement du fichier.', success: false });
+        // Gérer les erreurs s'il y a eu des problèmes lors de l'ajout du fichier
+        console.error('Error adding file:', error);
+        res.json({ message: error.message, type: 'danger' });
     }
 };
 
-exports.getUserFiles = async (req, res) => {
+exports.getAll = async (req, res) => {
     try {
-        // Récupérer l'utilisateur à partir de req.user défini dans le middleware d'authentification
-        const userEmail = req.user.email;
+        // Récupérer tous les enregistrements de la table File
+        const images = await File.findAll();
 
-        // Récupérer l'ID de l'utilisateur à partir de son adresse e-mail
-        const user = await User.findOne({ where: { email: userEmail } });
-        const userId = user.id;
-
-        // Rechercher les fichiers téléchargés par cet utilisateur
-        const userFiles = await File.findAll({ where: { uploadedBy: userId } });
-
-        // Renvoyer les fichiers trouvés
-        return res.status(200).json({ userFiles: userFiles });
+        // Rendre la page testejs avec la liste des fichiers récupérée
+        res.render('viewFiles', {
+            title: 'Home page',
+            images:images,
+        });
     } catch (error) {
-        return res.status(500).json({ message: 'Une erreur s\'est produite lors de la récupération des fichiers de l\'utilisateur.', success: false});
+        // Gérer les erreurs s'il y a eu des problèmes lors de la récupération des fichiers
+        console.error('Error fetching files:', error);
+        res.json({ message: error.message });
+    }
+};
+
+exports.fileAdd = async (req, res) => {
+    res.render("add_users", {
+        title: "Add Users"
+    });
+};
+
+exports.fileDelete = async (req, res) => {
+    try {
+        let id = req.params.id;
+
+        // Recherchez le fichier à supprimer dans la base de données
+        const fileToDelete = await File.findByPk(id);
+
+        if (!fileToDelete) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+
+        // Supprimez le fichier de la base de données
+        await fileToDelete.destroy();
+
+        // Envoyez une réponse de succès si le fichier a été supprimé avec succès
+        req.session.message = {
+            type: 'info',
+            message: 'File deleted successfully'
+        };
+        res.redirect("/files");
+
+    } catch (error) {
+        console.error('Error deleting file:', error);
+        res.status(500).json({ message: 'An error occurred while deleting the file' });
     }
 };

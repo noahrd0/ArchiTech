@@ -14,13 +14,15 @@ exports.showLoginPage = function(req, res) {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password);
         const user = await User.findOne({ where: { email: email } });
+        
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.', success: false});
         }
+
         // Générez le token JWT et renvoyez-le en réponse
         const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "1h" });
+        
         // Envoie uniquement le token comme réponse
         res.json({token, message: 'Connexion réussie.', success: true});
     } catch (error) {

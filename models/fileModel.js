@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../database/database');
 const User = require('./userModel'); // Importez le modèle User
 
-const File = sequelize.define('File', {
+const File = sequelize.define('Image', {
   filename: {
     type: DataTypes.STRING,
     allowNull: false
