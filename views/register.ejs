@@ -40,6 +40,7 @@
 
                         if (loginData.token) {
                             localStorage.setItem('token', loginData.token);
+                            window.location.href = '/user/login';
                         }
                         createAlert(loginData);
                     } catch (error) {

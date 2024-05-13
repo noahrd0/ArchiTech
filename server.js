@@ -5,6 +5,7 @@ const app = express();
 const sequelize = require('./database/database');
 const user = require('./routes/userRoute');
 const fileRoutes = require('./routes/fileRoute');
+const middleware = require('./routes/validateToken');
 
 app.set('view engine', 'ejs');
 app.use(express.static('views'));
@@ -27,7 +28,8 @@ app.use((req,res, next) => {
 });
 
 app.use('/user', user);
-app.use('/files', fileRoutes);
+app.use('/files', fileRoutes)
+app.use('/middleware', middleware);
 
 app.get('/', (req, res) => {
     res.render('index');

@@ -25,44 +25,44 @@
     <script>
         const form = document.getElementById('add-form');
 
-form.addEventListener('submit', async (event) => {
-    event.preventDefault();
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-    // Récupérer le token d'authentification du localStorage ou des cookies
-    const token = localStorage.getItem('token'); // ou depuis les cookies
+            // Récupérer le token d'authentification du localStorage ou des cookies
+            const token = localStorage.getItem('token'); // ou depuis les cookies
 
-    // Créer un objet FormData pour envoyer les données du formulaire
-    const formData = new FormData();
-    formData.append('file', form.file.files[0]); // Ajouter le fichier sélectionné au FormData
+            // Créer un objet FormData pour envoyer les données du formulaire
+            const formData = new FormData();
+            formData.append('file', form.file.files[0]); // Ajouter le fichier sélectionné au FormData
 
-    // Configurer l'en-tête de la requête avec le token d'authentification
-    const headers = {
-        Authorization: `${token}`,
-    };
+            // Configurer l'en-tête de la requête avec le token d'authentification
+            const headers = {
+                Authorization: `${token}`,
+            };
 
-    try {
-        // Effectuer une requête POST vers le serveur avec le FormData et les en-têtes configurés
-        const response = await fetch('/files/add', {
-            method: 'POST',
-            body: formData,
-            headers: headers,
+            try {
+                // Effectuer une requête POST vers le serveur avec le FormData et les en-têtes configurés
+                const response = await fetch('/files/add', {
+                    method: 'POST',
+                    body: formData,
+                    headers: headers,
+                });
+
+                console.log(response);
+                // Vérifier si la requête a réussi
+                if (response.ok) {
+                    // Si la réponse est réussie, rediriger l'utilisateur vers une page de succès ou effectuer toute autre action appropriée
+                    window.location.href = '/files'; // Redirection vers une page de succès
+                } else {
+                    // Si la requête a échoué, afficher un message d'erreur ou effectuer toute autre action appropriée
+                    console.error('Error adding file:', response.statusText);
+                    // Afficher un message d'erreur à l'utilisateur
+                }
+            } catch (error) {
+                console.error('Error adding file ici :', error);
+                // Afficher un message d'erreur à l'utilisateur
+            }
         });
-
-        console.log(response);
-        // Vérifier si la requête a réussi
-        if (response.ok) {
-            // Si la réponse est réussie, rediriger l'utilisateur vers une page de succès ou effectuer toute autre action appropriée
-            window.location.href = '/files'; // Redirection vers une page de succès
-        } else {
-            // Si la requête a échoué, afficher un message d'erreur ou effectuer toute autre action appropriée
-            console.error('Error adding file:', response.statusText);
-            // Afficher un message d'erreur à l'utilisateur
-        }
-    } catch (error) {
-        console.error('Error adding file ici :', error);
-        // Afficher un message d'erreur à l'utilisateur
-    }
-});
     </script>
 
     
