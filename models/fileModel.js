@@ -20,7 +20,8 @@ const File = sequelize.define('Image', {
     allowNull: false,
     references: {
       model: User,
-      key: 'id'
+      key: 'id',
+      onDelete: 'CASCADE'
     }
   }
 }, {

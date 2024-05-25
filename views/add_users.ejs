@@ -48,11 +48,10 @@
                     headers: headers,
                 });
 
-                console.log(response);
                 // Vérifier si la requête a réussi
                 if (response.ok) {
                     // Si la réponse est réussie, rediriger l'utilisateur vers une page de succès ou effectuer toute autre action appropriée
-                    window.location.href = '/files'; // Redirection vers une page de succès
+                    window.location.href = '/files';
                 } else {
                     // Si la requête a échoué, afficher un message d'erreur ou effectuer toute autre action appropriée
                     console.error('Error adding file:', response.statusText);
@@ -64,6 +63,5 @@
             }
         });
     </script>
-
     
 <%- include('partials/footer') %>

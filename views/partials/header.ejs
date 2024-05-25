@@ -6,30 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArchiTech</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-        body {
-            font-family: "Poppins", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .navbar .navbar-brand{
-            font-size: 1.2rem;
-            color: white;
-        }
-
-        .navbar .nav-link {
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/style.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>    <script src="https://kit.fontawesome.com/a3d328dfc5.js" crossorigin="anonymous"></script>
     <script src="../js/alert.js"></script>
+    <script src="../js/headerAuth.js"></script>
+    <script src="../js/deleteUser.js"></script>
 </head>
 
 <body style="flex: 1;">
@@ -54,22 +37,25 @@
                     <li class="nav-item" id="registerLink">
                         <a class="nav-link" href="/user/register">S'inscrire</a>
                     </li>
-                    <li class="dropdown" id="profilLink">
-                        <a class="btn dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Profil
-                        </a>
-                    
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" id="logoutLink" href="#">Se déconnecter</a></li>
+                    <li class="nav-item dropdown" id="profilLink">
+                        <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                          Profile
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
                             <li>
-                                <a class="dropdown-item" href="#">
-                                    <form action="/user/delete" id="deleteAccount" method="POST">
+                                <a class="dropdown-item" id="logoutLink" href="#">
+                                    <button type="submit" class="btn btn-danger">Se déconnecter</button>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/#">
+                                    <form id="deleteAccount" method="POST" onsubmit="deleteAccount(event)">
                                         <button type="submit" class="btn btn-danger">Supprimer mon compte</button>
                                     </form>
                                 </a>
                             </li>
                         </ul>
-                    </li>
+                      </li>
                 </ul>
             </div>
         </nav>

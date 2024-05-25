@@ -1,41 +1,59 @@
 <%- include('partials/header') %>
-    <h1>Connexion</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h1 class="text-center">Connexion</h1>
+                </div>
+                <div class="card-body">
+                    <% if (message) { %>
+                        <div class="alert alert-<%= message.type %> alert-dismissible fade show" role="alert">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <strong><%= message.message %></strong>
+                        </div>
+                    <% } %>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe:</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Se connecter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-    <form id="loginForm">
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required><br><br>
+        try {
+            const response = await fetch('http://localhost:3000/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-        <label for="password">Mot de passe:</label>
-        <input type="password" id="password" name="password" required><br><br>
+            const data = await response.json();
 
-        <input type="submit" value="Se connecter">
-    </form>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                const response = await fetch('http://localhost:3000/user/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
-
-                const data = await response.json();
-
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
-                    window.location.href = '/files';
-                }
-                createAlert(data);
-            } catch (error) {
-                catchAlert();
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '/files';
             }
-        });
-    </script>
+            createAlert(data);
+        } catch (error) {
+            catchAlert();
+        }
+    });
+</script>
 <%- include('partials/footer') %>

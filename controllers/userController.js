@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const File = require('../models/fileModel');
 const mailService = require('../services/mailService');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -9,6 +10,37 @@ exports.showRegisterPage = function(req, res) {
 
 exports.showLoginPage = function(req, res) {
     res.render('login');
+};
+
+// Middlewares
+exports.authenticator = async (req, res, next) => {
+    const token = req.body.token ? req.body.token : req.headers.authorization;
+    console.log(token);
+    
+    if (token) {
+        try {
+            let decoded = jwt.verify(token, process.env.SECRET_KEY);
+
+            if (decoded) {
+
+                const user  = await User.findOne({ where: { email: decoded.email } });
+
+                if (!user) {
+                    return res.status(401).json({ message: 'Créer un compte pour accéder à cette fonctionnalité.', success: false });
+                }
+                const userData = user.dataValues || user;
+
+                req.user = {
+                    email : userData.email,
+                };
+                next();
+            }
+        } catch (error) {
+            return res.status(401).json({ message: 'Une erreur s\'est produite avec votre compte, reconnectez-vous', success: false });
+        }
+    } else {
+        return res.status(401).json({ message: 'Créer un compte pour accéder à cette fonctionnalité.', success: false });
+    }
 };
 
 exports.login = async (req, res) => {
@@ -53,5 +85,38 @@ exports.register = async (req, res) => {
         res.json({token, message: 'Utilisateur créé avec succès.', success: true});
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Une erreur est survenue lors de la création de l\'utilisateur.' });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    
+    const userEmail = req.user.email;
+    const user = await User.findOne({ where: { email: userEmail } });
+    const userId = user.id;
+
+    try {
+        // Trouver les fichiers associés à l'utilisateur
+        const numberOfDeletedFiles = await File.destroy({ where: { uploadedBy: userId } });
+
+        // Supprimer l'utilisateur (les fichiers seront supprimés en cascade)
+        await User.destroy({ where: { id: userId } });  
+
+        // Envoyer l'email de notification à l'utilisateur
+        await mailService.sendMail(user.email, 'Suppression de compte', 'Votre compte a été supprimé avec succès.');
+
+        // Envoyer l'email de notification à l'administrateur
+        const adminEmail = 'admin@example.com'; // Remplacez par l'email de l'administrateur
+        await mailService.sendAdminNotification(adminEmail, user.email, numberOfDeletedFiles);
+
+        // Rediriger avec un message de succès si l'opération s'est déroulée avec succès
+        req.session.message = {
+            type: 'success',
+            message: 'Utilisateur et fichiers associés supprimés avec succès.'
+        };
+
+        res.status(200).json({ message: 'Utilisateur et fichiers associés supprimés avec succès.', success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de la suppression de l\'utilisateur.', success: false });
     }
 };

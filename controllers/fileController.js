@@ -59,7 +59,6 @@ exports.fileAddPost = async (req, res) => {
             message: 'Fichier ajouté avec succès'
         };
         res.json({message: 'Connexion réussie.', success: true});
-        // res.redirect('/files');
     } catch (error) {
         // Gérer les erreurs s'il y a eu des problèmes lors de l'ajout du fichier
         console.error('Error adding file:', error);

@@ -1,57 +1,82 @@
 <%- include('partials/header') %>
-    <h2>Registration</h2>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h2 class="text-center">Inscription</h2>
+                </div>
+                <div class="card-body">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe:</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmer le mot de passe:</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">S'inscrire</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-    <form id="registerForm">
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br>
-        <input type="submit" value="Register">
-    </form>
+        if (password !== confirmPassword) {
+            // Afficher un message d'erreur si les mots de passe ne correspondent pas
+            createAlert({ message: "Les mots de passe ne correspondent pas", type: "danger" });
+            return;
+        }
 
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        try {
+            const registerResponse = await fetch('http://localhost:3000/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-            try {
-                const registerResponse = await fetch('http://localhost:3000/user/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
+            const registerData = await registerResponse.json();
 
-                const registerData = await registerResponse.json();
+            if (registerData.token) {
+                try {
+                    const loginResponse = await fetch('http://localhost:3000/user/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
 
-                if (registerData.token) {
-                    try {
-                        const loginResponse = await fetch('http://localhost:3000/user/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ email, password }),
-                        });
+                    const loginData = await loginResponse.json();
 
-                        const loginData = await loginResponse.json();
-
-                        if (loginData.token) {
-                            localStorage.setItem('token', loginData.token);
-                            window.location.href = '/user/login';
-                        }
-                        createAlert(loginData);
-                    } catch (error) {
-                        catchAlert();
+                    if (loginData.token) {
+                        localStorage.setItem('token', loginData.token);
+                        window.location.href = '/files';
                     }
-                } else {
-                    createAlert(registerData);
+                    createAlert(loginData);
+                } catch (error) {
+                    catchAlert();
                 }
-            } catch (error) {
-                catchAlert();
+            } else {
+                createAlert(registerData);
             }
-        });
-    </script>
+        } catch (error) {
+            catchAlert();
+        }
+    });
+</script>
 <%- include('partials/footer') %>
