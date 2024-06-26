@@ -1,45 +1,25 @@
 {
-  "name": "architech",
+  "name": "architech-rebase",
   "version": "1.0.0",
-  "description": "projet annuel ipssi, mise en place d'une interface de gestion de fichiers clients",
-  "main": "server.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "test",
-    "start": "nodemon server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/noahrd0/ArchiTech.git"
-  },
-  "keywords": [
-    "Gestion",
-    "de",
-    "fichiers"
-  ],
-  "author": "n.radal l.develay",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/noahrd0/ArchiTech/issues"
-  },
-  "homepage": "https://github.com/noahrd0/ArchiTech#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.583.0",
+    "@aws-sdk/s3-request-presigner": "^3.583.0",
     "bcrypt": "^5.1.1",
-    "bootstrap-icons": "^1.11.3",
-    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "ejs": "^3.1.10",
     "express": "^4.19.2",
-    "express-session": "^1.18.0",
-    "fs": "^0.0.1-security",
-    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.3.0",
-    "mongoose": "^8.3.4",
     "multer": "^1.4.5-lts.1",
-    "mysql2": "^3.9.3",
-    "nodemailer": "^6.9.13",
-    "nodemon": "^3.1.0",
-    "path": "^0.12.7",
-    "sequelize": "^6.37.1"
+    "sequelize": "^6.37.3",
+    "uuid": "^9.0.1"
   }
 }
