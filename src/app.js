@@ -1,6 +1,7 @@
 const express = require('express');
 const sequelize = require('./backend/config/database');
 const app = express();
+const cors = require('cors');
 
 // const multer = require('multer');
 
@@ -11,6 +12,8 @@ const app = express();
 // // 'file' doit correspondre au nom du champ de type file dans le formulaire
 // // <input type="file" name="file">
 // upload.single('file');
+
+app.use(cors()); 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

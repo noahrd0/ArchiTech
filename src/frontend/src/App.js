@@ -5,8 +5,8 @@ import './App.css';
 import Login from './components/Login';
 import Register from './components/Register';
 import Header from './components/Header';
-import Upload from './components/Upload';
-import Files from './components/Files';
+import Upload from './components/FileUpload';
+import FileList from './components/FileList';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/upload" element={<Upload />} />
-              <Route path="/files" element={<Files />} />
+              <Route path="/list" element={<FileList />} />
             </Routes>
           </main>
         </div>

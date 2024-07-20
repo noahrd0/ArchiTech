@@ -48,7 +48,7 @@ exports.upload = async (req, res) => {
             throw err;
         }
         
-        res.status(201).json({ message: 'Fichier enregistré', file, aws_file});
+        res.status(201).json({ message: 'Fichier enregistré', file});
     } catch (err) {
         res.status(400).json({ message: err.message, stack: err.stack });
     }

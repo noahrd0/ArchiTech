@@ -3,6 +3,8 @@ const File = require('../models/fileModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
+const { s3Client } = require('../config/aws');
+const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 async function passwordHasher(password) {
     // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
@@ -76,17 +78,23 @@ exports.delete = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         }
+
         const files = await File.findAll({ where: { user_id: user.id } });
         for (const file of files) {
+            const deleteObjectParams = {
+                Bucket: bucketName, // Assurez-vous que bucketName est défini
+                Key: file.uuid
+            };
+            await s3Client.send(new DeleteObjectCommand(deleteObjectParams));
             await file.destroy();
         }
-        // Supression des factures a integrer
+
         await user.destroy();
         res.status(200).json({ message: 'Utilisateur et ses fichiers supprimés' });
     } catch (err) {
         res.status(400).json(err);
     }
-}
+};
 
 exports.update = async (req, res) => {
     try {
