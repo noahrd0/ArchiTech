@@ -51,6 +51,22 @@ exports.login = async (req, res) => {
     }
 }
 
+exports.buy_storage = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        } else {
+            user.storage += 1000000;
+            await user.save();
+            res.status(200).json(user);
+        }
+    }
+    catch (err) {
+        res.status(400).json(err);
+    }
+}
+
 exports.list = async (req, res) => {
     try {
         const users = await User.findAll();

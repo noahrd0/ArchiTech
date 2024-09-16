@@ -26,6 +26,9 @@ app.use('/api/user', userRoutes);
 const fileRoutes = require('./backend/routes/fileRoutes');
 app.use('/api/file', authToken, fileRoutes);
 
+const adminRoutes = require('./backend/routes/adminRoutes');
+app.use('/api/admin', authToken, adminRoutes);
+
 // Middleware qui affiche les erreurs non gérées
 app.use((err, req, res, next) => {
     console.error(err.stack);
