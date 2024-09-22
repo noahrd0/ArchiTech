@@ -16,12 +16,18 @@ exports.list = async (req, res) => {
 
 exports.get_user_files = async (req, res) => {
     try {
-        const files = await File.findAll({ where: { user_id: req.params.id } });
-        res.status(200).json(files);
+        const userId = req.params.id; // Récupérer l'ID de l'utilisateur
+        const files = await File.findAll({ where: { user_id: userId } }); // Récupérer les fichiers de cet utilisateur
+        if (!files.length) {
+            return res.status(404).json({ message: 'Aucun fichier trouvé pour cet utilisateur.' });
+        }
+        res.status(200).json(files); // Retourner la liste des fichiers
     } catch (err) {
         res.status(400).json(err);
     }
-}
+};
+
+
 
 exports.get_user_storage = async (req, res) => {
     try {

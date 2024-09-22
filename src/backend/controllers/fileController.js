@@ -84,6 +84,28 @@ exports.get = async (req, res) => {
     }
 }
 
+exports.getAdmin = async (req, res) => {
+    try {
+        user_id = req.params.user_id;
+        console.log(user_id);
+        console.log(req.params);
+
+        const file = await File.findOne({ where: { name: req.params.file_name, user_id } });
+        if (!file) {
+            return res.status(404).json({ message: 'Fichier non trouvé' });
+        } else {
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: file.uuid
+            };
+            const url = await getSignedUrl(s3Client, new GetObjectCommand(getObjectParams), { expiresIn: 3600 });
+            res.status(200).json({url: url, file: file});
+        }
+    } catch (err) {
+        res.status(400).json(err);
+    }
+}
+
 exports.download = async (req, res) => {
     try {
         user_id = req.user.id;

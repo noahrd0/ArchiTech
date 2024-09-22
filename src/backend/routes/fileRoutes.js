@@ -14,6 +14,7 @@ const upload = multer({ storage: storage });
 router.post('/upload', upload.single('file'), fileController.upload);
 router.get('/list', fileController.list);
 router.get('/:file_name', fileController.get);
+router.get('/:file_name/:user_id', fileController.getAdmin);
 router.get('/download/:file_name', fileController.download);
 router.delete('/:file_name', fileController.delete);
 router.put('/:file_name', upload.single('file'), fileController.update);

@@ -18,7 +18,7 @@ async function passwordHasher(password) {
 
 exports.register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password } = req.body; // Ajoute le rôle dans les paramètres
         if (!email || !password) {
             return res.status(400).json({ message: 'Email et mot de passe obligatoires' });
         }
@@ -28,12 +28,13 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: 'Email déjà utilisé' });
         }
 
-        const user = await User.create({ email, password: await passwordHasher(password) });
+        const user = await User.create({ email, password: await passwordHasher(password)});
         res.status(201).json(user);
     } catch (err) {
         res.status(400).json(err);
     }
 }
+
 
 exports.login = async (req, res) => {
     try {
@@ -42,14 +43,21 @@ exports.login = async (req, res) => {
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
-        } else {
-            const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
-            res.status(200).json({ user, token });
         }
+
+
+        const token = jwt.sign(
+            { id: user.id}, // Assure-toi que le rôle est bien inclus
+            process.env.SECRET_KEY, 
+            { expiresIn: '1h' }
+        );
+
+        res.status(200).json({ user, token });
     } catch (err) {
         res.status(400).json(err);
     }
-}
+};
+
 
 exports.buy_storage = async (req, res) => {
     try {
