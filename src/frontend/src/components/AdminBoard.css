@@ -58,17 +58,28 @@ h2 {
   margin: 8px 0;
   background-color: #f5f5f5;
   border-radius: 4px;
-  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.user-item:hover {
-  background-color: #e0e0e0;
+
+.user-item span{
+  cursor: pointer;
 }
 
 .user-email {
   font-size: 1rem;
   color: #333;
+}
+
+.delete-button {
+  border: none;
+  color: red;
+  z-index: 30;
+  cursor: pointer;
+}
+
+.delete-button svg{
+  height: 30px;
 }
 
 @media (max-width: 768px) {
