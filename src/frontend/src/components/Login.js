@@ -23,7 +23,7 @@ function Login() {
       .then(data => {
         if (data.token) {
           login(data.token);
-          navigate('/files');
+          navigate('/list');
         } else {
           alert('Échec de la connexion: ' + (data.message || 'Veuillez réessayer'));
         }
@@ -32,31 +32,33 @@ function Login() {
   };
 
   return (
-    <div className="form-container">
-      <h2 className="form-title">Connexion</h2>
-      <form className="form" onSubmit={handleLogin}>
-        <div className="form-group">
-          <label className="form-label">Email:</label>
-          <input
-            type="email"
-            className="form-input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="login-container">
+      <div className='login-form-container'>
+        <h2 className="form-title">Connexion</h2>
+        <form className="form" onSubmit={handleLogin}>
+          <div className="form-group">
+            <label className="form-label">Email:</label>
+            <input
+              type="email"
+              className="form-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Mot de passe:</label>
+            <input
+              type="password"
+              className="form-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="form-button">Se connecter</button>
+        </form>
         </div>
-        <div className="form-group">
-          <label className="form-label">Mot de passe:</label>
-          <input
-            type="password"
-            className="form-input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="form-button">Se connecter</button>
-      </form>
     </div>
   );
 }

@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import logo from '../img/logo.png';
 import './Header.css';
 
 function Header() {
   const { isAuthenticated, logout, userId } = useContext(AuthContext);
   const [userRole, setUserRole] = useState(null);
-  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
@@ -48,7 +50,6 @@ function Header() {
       .then(data => {
         setUserRole(data.role);
       })
-      
       .catch(error => {
         console.error('Erreur lors de la récupération du rôle:', error);
       });
@@ -57,22 +58,41 @@ function Header() {
   return (
     <header className="header">
       <div className="container">
-        <div className="logo">Votre Logo</div>
-        <nav className="nav">
+        <div className="logo">
+          <img src={logo} alt="logo"></img>
+        </div>
+
+        {/* Bouton Hamburger */}
+        <div className='container-hamburger'>
+          <div className={`hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
+            <span className="bar"></span>
+            <span className="bar"></span>
+            <span className="bar"></span>
+          </div>
+        </div>
+
+        {/* Navigation avec gestion du menu ouvert/fermé */}
+        <nav className={`nav ${menuOpen ? 'open' : ''}`}>
           <ul className="nav-list">
             {isAuthenticated ? (
               <>
-                <li className="nav-item"><Link to="/list" className="nav-link">Mes Fichiers</Link></li>
+                <li className="nav-item"><Link to="/list" className="nav-link" onClick={() => setMenuOpen(false)}>Mes Fichiers</Link></li>
                 {userRole === 'admin' && (
-                  <li className="nav-item"><Link to="/admin" className="nav-link">Panneau Admin</Link></li>
+                  <li className="nav-item"><Link to="/admin" className="nav-link" onClick={() => setMenuOpen(false)}>Panneau Admin</Link></li>
                 )}
                 <li className="nav-item">
-                  <div className="dropdown">
-                    <button onClick={() => setShowDropdown(!showDropdown)} className="nav-link btn-dropdown">Compte</button>
+                  <div 
+                    className="dropdown" 
+                    onMouseEnter={() => setShowDropdown(true)} 
+                    onMouseLeave={() => setShowDropdown(false)}
+                  >
+                    <button className="nav-link btn-dropdown">
+                      Compte
+                    </button>
                     {showDropdown && (
                       <div className="dropdown-content">
-                        <button className="dropdown-item" onClick={handleLogout}>Déconnexion</button>
-                        <button className="dropdown-item" onClick={handleDeleteAccount}>Supprimer le compte</button>
+                        <button className="dropdown-item" onClick={() => { handleLogout(); setMenuOpen(false); }}>Déconnexion</button>
+                        <button className="dropdown-item" onClick={() => { handleDeleteAccount(); setMenuOpen(false); }}>Supprimer le compte</button>
                       </div>
                     )}
                   </div>
@@ -80,8 +100,8 @@ function Header() {
               </>
             ) : (
               <>
-                <li className="nav-item"><Link to="/register" className="nav-link">Inscription</Link></li>
-                <li className="nav-item"><Link to="/login" className="nav-link">Connexion</Link></li>
+                <li className="nav-item-auth"><Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Inscription</Link></li>
+                <li className="nav-item-auth"><Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}>Connexion</Link></li>
               </>
             )}
           </ul>

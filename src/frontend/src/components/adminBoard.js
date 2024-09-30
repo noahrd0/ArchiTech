@@ -74,7 +74,6 @@ const AdminBoard = () => {
         if (response.ok) {
           // Filtrer l'utilisateur supprimé de la liste des utilisateurs
           setUsers(users.filter(user => user.id !== userId));
-          console.log('Utilisateur supprimé avec succès');
         } else {
           const errorData = await response.json();
           console.error('Erreur lors de la suppression de l\'utilisateur:', errorData.message);

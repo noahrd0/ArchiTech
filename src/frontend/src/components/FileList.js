@@ -6,10 +6,12 @@ import './FileList.css';
 
 const FileList = () => {
     const [files, setFiles] = useState([]);
-    const [files_details, setFiles_details] = useState([]);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortOption, setSortOption] = useState('date'); // 'date' par défaut
+    const [selectedFormat, setSelectedFormat] = useState('all');
     const dropContainerRef = useRef(null);
 
     useEffect(() => {
@@ -72,19 +74,16 @@ const FileList = () => {
                 },
             });
 
-            setFiles(response.data);
-
-            const detailsPromises = response.data.map(file =>
-                axios.get(`/api/file/${file.name}`, {
+            const filesWithDetails = await Promise.all(response.data.map(async (file) => {
+                const detailResponse = await axios.get(`/api/file/${file.name}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
-                })
-            );
+                });
+                return { ...file, details: detailResponse.data }; // Ajoute les détails du fichier ici
+            }));
 
-            const detailsResponses = await Promise.all(detailsPromises);
-            setFiles_details(detailsResponses.map(res => res.data));
-
+            setFiles(filesWithDetails);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching files:', error);
@@ -122,10 +121,9 @@ const FileList = () => {
                 },
             });
 
-            console.log('File uploaded:', response.data.file);
-            setFile(null); // Réinitialiser le fichier après le téléversement
-            setUploadSuccess(true); // Afficher le message de succès
-            fetchFiles(); // Rafraîchir la liste des fichiers
+            setFile(null);
+            setUploadSuccess(true); 
+            fetchFiles();
 
             // Cacher le message après 3 secondes
             setTimeout(() => {
@@ -140,6 +138,34 @@ const FileList = () => {
         setFile(e.target.files[0]);
     };
 
+    const sortFiles = (files) => {
+        switch (sortOption) {
+            case 'size': // Trier par poids
+                return [...files].sort((a, b) => b.size - a.size);
+            case 'name': // Trier par nom
+                return [...files].sort((a, b) => a.name.localeCompare(b.name));
+            case 'date': // Trier par date
+            default:
+                return [...files].sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+        }
+    };
+
+    // Fonction de filtrage
+    const filteredFiles = files
+        .filter(file => {
+            // Filtrer par nom
+            return file.name.toLowerCase().includes(searchTerm.toLowerCase());
+        })
+        .filter(file => {
+            // Filtrer par format
+            if (selectedFormat === 'all') return true;
+            return file.name.endsWith(`.${selectedFormat}`);
+        });
+
+    const handleFormatChange = (e) => {
+        setSelectedFormat(e.target.value);
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -149,31 +175,52 @@ const FileList = () => {
             {uploadSuccess && <div className="upload-message">Fichier téléversé avec succès !</div>}
             <div className='top-upload-section'>
                 <h2>Mes Fichiers</h2>
+                <div className="search-container">
+                    <input
+                        type="text"
+                        placeholder="Rechercher un fichier..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <select onChange={handleFormatChange} value={selectedFormat}>
+                        <option value="all">Tous les formats</option>
+                        <option value="pdf">PDF</option>
+                        <option value="jpg">JPG</option>
+                        <option value="jpeg">JPEG</option>
+                        <option value="png">PNG</option>
+                        <option value="gif">GIF</option>
+                    </select>
+                    <select id="sort" value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+                        <option value="date">Date d'upload</option>
+                        <option value="size">Poids</option>
+                        <option value="name">Nom</option>
+                    </select>
+                </div>
             </div>
-            {files.length === 0 ? (
+            {filteredFiles.length === 0 ? (
                 <p>Vous n'avez aucun fichier téléversé.</p>
             ) : (
               <div className='container-files'>
                 <div className='upload-section'>
                   <label htmlFor="images" className="drop-container" ref={dropContainerRef}>
-                          <span className="drop-title">Déposer des images ici</span>
-                          ou
-                          <input type="file" id="images" onChange={handleFileChange} />
-                          <button className="upload-button" onClick={handleUpload}>Téléverser</button>
+                      <span className="drop-title">Déposer des images ici</span>
+                      ou
+                      <input type="file" id="images" onChange={handleFileChange} />
+                      <button className="upload-button" onClick={handleUpload}>Téléverser</button>
                   </label>
                 </div>
                 <div className="file-list">
-                    {files.map((file, index) => (
+                    {sortFiles(filteredFiles).map((file, index) => (
                         <div key={file.uuid} className="file-item">
                             {file.name.endsWith('.pdf') ? (
                                 <FontAwesomeIcon icon={faFilePdf} size="3x" />
                             ) : file.name.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                                <img src={files_details[index]?.url} alt={file.name} width={100} height={100} style={{ objectFit: 'cover' }} />
+                                <img src={file.details.url} alt={file.name} width={100} height={100} style={{ objectFit: 'cover' }} />
                             ) : (
                                 <FontAwesomeIcon icon={faFile} size="3x" />
                             )}
                             <p>{file.name}</p>
-                            <button onClick={() => handleDownload(files_details[index]?.url, file.name)}>
+                            <button onClick={() => handleDownload(file.details.url, file.name)}>
                                 Télécharger
                             </button>
                         </div>

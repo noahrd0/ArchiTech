@@ -22,7 +22,6 @@ const UserFileList = () => {
                 });
 
                 setFiles(response.data);
-                console.log(response.data);
 
                 const detailsPromises = response.data.map(file =>
                     axios.get(`/api/file/${file.name}/${userId}`, {
@@ -31,7 +30,6 @@ const UserFileList = () => {
                       },
                     })
                   );
-                  console.log(detailsPromises);
 
                   const detailsResponses = await Promise.all(detailsPromises);
                     setFiles_details(detailsResponses.map(res => res.data));
