@@ -62,7 +62,6 @@ function Header() {
           <ul className="nav-list">
             {isAuthenticated ? (
               <>
-                <li className="nav-item"><Link to="/upload" className="nav-link">Uploader Fichiers</Link></li>
                 <li className="nav-item"><Link to="/list" className="nav-link">Mes Fichiers</Link></li>
                 {userRole === 'admin' && (
                   <li className="nav-item"><Link to="/admin" className="nav-link">Panneau Admin</Link></li>
