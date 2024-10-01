@@ -10,6 +10,7 @@ import FileList from './components/FileList';
 import { AuthProvider } from './context/AuthContext';
 import  AdminBoard  from './components/adminBoard';
 import UserFiles from './components/AdminUserFiles';
+import Checkout from './components/Checkout';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
               <Route path="/list" element={<FileList />} />
               <Route path="/admin" element={<AdminBoard />} />
               <Route path="/admin/user/:userId/files" element={<UserFiles />} />
+              <Route path="/checkout" element={<Checkout />} />
             </Routes>
           </main>
         </div>

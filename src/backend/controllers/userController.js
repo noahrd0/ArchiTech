@@ -1,10 +1,12 @@
 const User = require('../models/userModel');
 const File = require('../models/fileModel');
+const Invoice = require('../models/invoiceModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const { s3Client } = require('../config/aws');
 const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 async function passwordHasher(password) {
     // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
@@ -59,15 +61,40 @@ exports.login = async (req, res) => {
 };
 
 
-exports.buy_storage = async (req, res) => {
+exports.add_storage = async (req, res) => {
     try {
+        console.log('add_storage');
+        const { session_id } = req.body;
+        if (!session_id) {
+            return res.status(400).json({ error: 'No session_id provided' });
+        }
         const user = await User.findByPk(req.user.id);
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         } else {
-            user.storage += 1000000;
-            await user.save();
-            res.status(200).json(user);
+            const session = await stripe.checkout.sessions.retrieve(session_id);
+            console.log('session payment', session.payment_status);
+
+            // On bloque l'ajout de stockage si une facture avec cette session existe déjà
+            const existingInvoice = await Invoice.findOne({ where: { stripe_session_id: session_id } });
+            if (existingInvoice) {
+                return res.status(400).json({ message: 'Une facture avec cette session existe déjà' });
+            }
+            if (session.payment_status === 'paid') {
+                user.storage += 20 * 1024 * 1024 * 1024; // 20Go en octets
+                await user.save();
+
+                // Creation de la facture
+                const date = new Date();
+                const invoice = await Invoice.create({ user_id: user.id, date, stripe_session_id: session_id });
+                if (!invoice) {
+                    return res.status(500).json({ error: 'Failed to create invoice' });
+                }
+
+                res.status(200);
+            } else {
+                res.status(400).json({ message: 'Echec du paiement' });
+            }
         }
     }
     catch (err) {

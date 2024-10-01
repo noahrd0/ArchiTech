@@ -67,6 +67,7 @@ function Header() {
                 {userRole === 'admin' && (
                   <li className="nav-item"><Link to="/admin" className="nav-link">Panneau Admin</Link></li>
                 )}
+                <li className="nav-item"><Link to="/checkout" className="nav-link">Stockage</Link></li>
                 <li className="nav-item">
                   <div className="dropdown">
                     <button onClick={() => setShowDropdown(!showDropdown)} className="nav-link btn-dropdown">Compte</button>

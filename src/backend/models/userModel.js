@@ -19,6 +19,11 @@ const User = sequelize.define('user', {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: 'user'
+    },
+    storage : {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0
     }
 }, {
     tableName: 'user',
