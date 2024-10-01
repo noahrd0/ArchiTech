@@ -3,12 +3,15 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faFile, faTrashAlt } from '@fortawesome/free-solid-svg-icons'; // Importer l'icône de suppression
 import './FileList.css';
+import { set } from 'date-fns';
 
 const FileList = () => {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [uploadError, setUploadError] = useState(false);
+    const [storageError, setStorageError] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState('date');
     const [selectedFormat, setSelectedFormat] = useState('all');
@@ -119,6 +122,7 @@ const FileList = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
+            console.log('response.status', response.status);
 
             setFile(null);
             setUploadSuccess(true);
@@ -128,6 +132,17 @@ const FileList = () => {
                 setUploadSuccess(false);
             }, 3000);
         } catch (error) {
+            if (error.response && error.response.status === 507) {
+                setStorageError(true);
+                setTimeout(() => {
+                    setStorageError(false);
+                }, 3000);
+            } else {
+                setUploadError(true);
+                setTimeout(() => {
+                    setUploadError(false);
+                }, 3000);
+            }
             console.error('Error uploading file:', error);
         }
     };
@@ -184,6 +199,8 @@ const FileList = () => {
     return (
         <div className="file-list-container">
             {uploadSuccess && <div className="upload-message">Fichier téléversé avec succès !</div>}
+            {uploadError && <div className="error-message">Erreur lors du téléversement du fichier.</div>}
+            {storageError && <div className="error-message">Stockage insuffisant.</div>}
             <div className='top-upload-section'>
                 <h2>Mes Fichiers</h2>
                 <div className="search-container">

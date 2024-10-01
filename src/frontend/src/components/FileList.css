@@ -141,6 +141,15 @@ border-color: #111;
     margin-bottom: 20px;
 }
 
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
 /* Barre de recherche */
 .file-list-container .search-container {
     display: flex;
