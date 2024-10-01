@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import  AdminBoard  from './components/adminBoard';
 import UserFiles from './components/AdminUserFiles';
 import Checkout from './components/Checkout';
+import Invoice from './components/Invoice';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               <Route path="/admin" element={<AdminBoard />} />
               <Route path="/admin/user/:userId/files" element={<UserFiles />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/invoices" element={<Invoice />} />
             </Routes>
           </main>
         </div>

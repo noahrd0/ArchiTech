@@ -25,6 +25,9 @@ app.use('/api/admin', authToken, adminRoutes);
 const checkoutRoutes = require('./backend/routes/checkoutRoutes');
 app.use('/api/checkout', authToken, checkoutRoutes);
 
+const invoiceRoutes = require('./backend/routes/invoiceRoutes');
+app.use('/api/invoice', authToken, invoiceRoutes);
+
 // Middleware qui affiche les erreurs non gérées
 app.use((err, req, res, next) => {
     console.error(err.stack);

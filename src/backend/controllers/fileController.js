@@ -4,6 +4,7 @@ const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = re
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { v4: uuidv4 } = require('uuid');
 const e = require('express');
+const User = require('../models/userModel');
 
 dotenv.config();
 
@@ -24,6 +25,20 @@ const s3Client = new S3Client({
 exports.upload = async (req, res) => {
     try {
         user_id = req.user.id;
+
+        const user = await User.findByPk(user_id);
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+        const user_files = await File.findAll({ where: { user_id } });
+        user_storage_used = 0;
+        for (const file of user_files) {
+            user_storage_used += file.size;
+        }
+        if (user_storage_used + req.file.size > user.storage) {
+            return res.status(507).json({ message: 'Limite de stockage atteinte' });
+        }
+
         const uuid = uuidv4();
 
         const file = await File.create({
