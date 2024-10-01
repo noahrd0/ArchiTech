@@ -3,6 +3,8 @@ const File = require('../models/fileModel');
 const Invoice = require('../models/invoiceModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const sendEmail = require('../config/sendEmail');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 // const { s3Client } = require('../config/aws');
 const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
@@ -45,6 +47,14 @@ exports.register = async (req, res) => {
         }
 
         const user = await User.create({ email, password: await passwordHasher(password)});
+
+        // Envoyer un email de bienvenue
+        await sendEmail(
+            user.email,
+            'Bienvenue sur notre site',
+            `Bonjour ${user.email},\n\nMerci de vous être inscrit sur notre site !\nNous espérons que vous apprécierez votre expérience.\n\nCordialement,\nL'équipe d'Architech`
+        );
+
         res.status(201).json(user);
     } catch (err) {
         res.status(400).json(err);
@@ -154,7 +164,26 @@ exports.delete = async (req, res) => {
             await file.destroy();
         }
 
+        await sendEmail(
+            user.email,
+            'Suppression de votre compte',
+            `Bonjour,\n\nVotre compte a été supprimé avec succès. Si vous pensez que cela est une erreur, veuillez nous contacter.\n\nCordialement,\nL'équipe d'Architech`
+        );
+
+        const admins = await User.findAll({ where: { role: 'admin' } });
+        const adminEmails = admins.map(admin => admin.email); // Supposons que l'email est dans admin.email
+
+        const adminEmailPromises = adminEmails.map(email => 
+            sendEmail(
+                email,
+                'Suppression de compte',
+                `Bonjour,\n\nL'utilisateur ${user.email} a supprimé son compte.\n\nCordialement,\nL'équipe du site`
+            )
+        );
+
+        await Promise.all(adminEmailPromises);
         await user.destroy();
+
         res.status(200).json({ message: 'Utilisateur et ses fichiers supprimés' });
     } catch (err) {
         res.status(400).json({ error: 'Erreur lors de la suppression de l\'utilisateur', details: err.message });
