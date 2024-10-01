@@ -97,8 +97,8 @@ function Header() {
                     {showDropdown && (
                       <div className="dropdown-content">
                         <button className="dropdown-item" onClick={() => { handleInvoice(); setMenuOpen(false); }}>Factures</button>
-                        <button className="dropdown-item" onClick={() => { handleLogout(); setMenuOpen(false); }}>Déconnexion</button>
-                        <button className="dropdown-item" onClick={() => { handleDeleteAccount(); setMenuOpen(false); }}>Supprimer le compte</button>
+                        <button className="dropdown-item " onClick={() => { handleLogout(); setMenuOpen(false); }}>Déconnexion</button>
+                        <button className="dropdown-item delete-account" onClick={() => { handleDeleteAccount(); setMenuOpen(false); }}>Supprimer le compte</button>
                       </div>
                     )}
                   </div>

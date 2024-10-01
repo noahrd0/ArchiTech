@@ -25,10 +25,10 @@ const s3Client = new S3Client({
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 async function passwordHasher(password) {
-    // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-    // if (!passwordRegex.test(password)) {
-    //     return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule et un chiffre' });
-    // }
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule et un chiffre' });
+    }
 
     const salt = await bcrypt.genSalt(10);
     return bcrypt.hash(password, salt);
@@ -169,7 +169,7 @@ exports.delete = async (req, res) => {
         );
 
         const admins = await User.findAll({ where: { role: 'admin' } });
-        const adminEmails = admins.map(admin => admin.email); // Supposons que l'email est dans admin.email
+        const adminEmails = admins.map(admin => admin.email);
 
         const adminEmailPromises = adminEmails.map(email => 
             sendEmail(
