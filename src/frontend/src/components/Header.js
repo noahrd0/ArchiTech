@@ -13,7 +13,7 @@ function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/connexion');
   };
 
   const handleDeleteAccount = async () => {
@@ -101,8 +101,7 @@ function Header() {
               </>
             ) : (
               <>
-                <li className="nav-item-auth"><Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Inscription</Link></li>
-                <li className="nav-item-auth"><Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}>Connexion</Link></li>
+                <li className="nav-item-auth"><Link to="/connexion" className="nav-link" onClick={() => setMenuOpen(false)}>Connexion</Link></li>
               </>
             )}
           </ul>
