@@ -64,8 +64,8 @@ const Checkout = () => {
                     <p>20€</p>
                 </div>
                 <div className="card-body">
-                    {success && <div id="success-message" className="alert alert-success" style={{ display: 'block' }}>Payment successful! Storage added.</div>}
-                    {canceled && <div id="canceled-message" className="alert alert-danger" style={{ display: 'block' }}>Payment canceled. Please try again.</div>}
+                    {success && <div id="success-message" className="alert alert-success" style={{ display: 'block' }}>Paiement réussit, stockage ajouté.</div>}
+                    {canceled && <div id="canceled-message" className="alert alert-danger" style={{ display: 'block' }}>Paiement annulé.</div>}
                     <div className="text-center">
                         <button className="btn btn-primary" onClick={handleClick}>Acheter</button>
                     </div>

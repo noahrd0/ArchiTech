@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const File = require('../models/fileModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const { use } = require('../routes/userRoutes');
 require('dotenv').config();
 
 exports.list = async (req, res) => {
@@ -27,8 +28,6 @@ exports.get_user_files = async (req, res) => {
     }
 };
 
-
-
 exports.get_user_storage = async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
@@ -41,6 +40,37 @@ exports.get_user_storage = async (req, res) => {
         res.status(400).json(err);
     }
 }
+
+exports.storage = async (req, res) => {
+    try {
+        const storage = [];
+        const users = await User.findAll();
+        for (const user of users) {
+            const user_storage_available = user.storage / (1024 * 1024 * 1024);
+            let user_storage_used = 0;
+            let user_storage_percentage = 0;
+            const files = await File.findAll({ where: { user_id: user.id } });
+            for (const file of files) {
+                user_storage_used += file.size;
+            }
+            user_storage_used = user_storage_used / (1024 * 1024 * 1024);
+            if (user_storage_available === 0) {
+                user_storage_percentage = 100;
+            } else {
+                user_storage_percentage = (user_storage_used / user_storage_available) * 100;
+            }
+            storage.push({
+                user_id: user.id,
+                storage_available: user_storage_available.toFixed(2),
+                storage_used: user_storage_used.toFixed(2),
+                storage_percentage: user_storage_percentage.toFixed(2)
+            });
+        }
+        res.status(200).json(storage);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+};
 
 exports.statistics = async (req, res) => {
     try {

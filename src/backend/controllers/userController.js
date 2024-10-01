@@ -86,7 +86,6 @@ exports.login = async (req, res) => {
 
 exports.add_storage = async (req, res) => {
     try {
-        console.log('add_storage');
         const { session_id } = req.body;
         if (!session_id) {
             return res.status(400).json({ error: 'No session_id provided' });
@@ -96,7 +95,6 @@ exports.add_storage = async (req, res) => {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         } else {
             const session = await stripe.checkout.sessions.retrieve(session_id);
-            console.log('session payment', session.payment_status);
 
             // On bloque l'ajout de stockage si une facture avec cette session existe déjà
             const existingInvoice = await Invoice.findOne({ where: { stripe_session_id: session_id } });

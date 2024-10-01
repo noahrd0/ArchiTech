@@ -4,7 +4,8 @@ import { AuthContext } from '../context/AuthContext';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons'; // Importer l'icône de poubelle
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 import './AdminBoard.css';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -15,6 +16,7 @@ const AdminBoard = () => {
   const [statistics, setStatistics] = useState({});
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [storageData, setStorageData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,6 +49,18 @@ const AdminBoard = () => {
       .then(data => setStatistics(data))
       .catch(error => console.error('Erreur lors de la récupération des statistiques:', error));
 
+    const fetchStorageData = async () => {
+      try {
+        const response = await axios.get('/api/admin/storage', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setStorageData(response.data);
+      } catch (error) {
+        console.error('Error fetching storage data:', error);
+      }
+    };
+
+    fetchStorageData();
   }, [userId]);
 
   if (loading) return <p>Chargement...</p>;
@@ -127,15 +141,33 @@ const AdminBoard = () => {
         <div className="users-list-container card">
           <h2>Liste des utilisateurs</h2>
           <ul className="users-list">
-            {users.map(user => (
-              <li key={user.id}  className="user-item">
-                <span onClick={() => handleUserClick(user.id)} className="user-email">{user.email}</span>
-                <button onClick={() => handleUserDelete(user.id)} className="delete-button">
-                <FontAwesomeIcon icon={faTrash} />
-                </button>
-
-              </li>
-            ))}
+            {users.map(user => {
+              const userStorage = storageData.find(storage => storage.user_id === user.id);
+              return (
+                <li key={user.id} className="user-item">
+                  <span onClick={() => handleUserClick(user.id)} className="user-email">{user.email}</span>
+                  {userStorage && (
+                    <>
+                        <div className='admin-storage'>
+                            <div className="storage-bar">
+                                <div
+                                    className="storage-used"
+                                    style={{ width: `${userStorage.storage_percentage}%` }}
+                                >
+                                </div>
+                            </div>
+                            <div className="storage-info">
+                                {userStorage.storage_used} Go / {userStorage.storage_available} Go ({userStorage.storage_percentage}%)
+                            </div>
+                        </div>    
+                    </>
+                    )}
+                    <button onClick={() => handleUserDelete(user.id)} className="delete-button">
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
