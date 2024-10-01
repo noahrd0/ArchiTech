@@ -28,7 +28,7 @@ function Header() {
       });
       if (response.ok) {
         logout();
-        navigate('/register');
+        navigate('/connexion');
       } else {
         console.error('Erreur lors de la suppression du compte');
       }
