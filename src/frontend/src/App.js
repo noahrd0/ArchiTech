@@ -5,7 +5,6 @@ import './App.css';
 import Login from './components/Login';
 import Register from './components/Register';
 import Header from './components/Header';
-import Upload from './components/FileUpload';
 import FileList from './components/FileList';
 import { AuthProvider } from './context/AuthContext';
 import  AdminBoard  from './components/adminBoard';
@@ -22,7 +21,6 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/upload" element={<Upload />} />
               <Route path="/list" element={<FileList />} />
               <Route path="/admin" element={<AdminBoard />} />
               <Route path="/admin/user/:userId/files" element={<UserFiles />} />
