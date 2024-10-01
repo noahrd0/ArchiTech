@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilePdf, faFile } from '@fortawesome/free-solid-svg-icons';
+import { faFilePdf, faFile, faTrashAlt } from '@fortawesome/free-solid-svg-icons'; // Importer l'icône de suppression
 import './FileList.css';
 
 const FileList = () => {
@@ -10,7 +10,7 @@ const FileList = () => {
     const [file, setFile] = useState(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortOption, setSortOption] = useState('date'); // 'date' par défaut
+    const [sortOption, setSortOption] = useState('date');
     const [selectedFormat, setSelectedFormat] = useState('all');
     const dropContainerRef = useRef(null);
 
@@ -51,7 +51,6 @@ const FileList = () => {
             dropContainer.addEventListener("dragleave", handleDragLeave);
             dropContainer.addEventListener("drop", handleDrop);
 
-            // Cleanup function
             return () => {
                 dropContainer.removeEventListener("dragover", handleDragOver);
                 dropContainer.removeEventListener("dragenter", handleDragEnter);
@@ -80,7 +79,7 @@ const FileList = () => {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-                return { ...file, details: detailResponse.data }; // Ajoute les détails du fichier ici
+                return { ...file, details: detailResponse.data };
             }));
 
             setFiles(filesWithDetails);
@@ -102,7 +101,7 @@ const FileList = () => {
     const handleUpload = async () => {
         if (!file) {
             console.warn('No file selected');
-            return; // Si aucun fichier n'est sélectionné, ne rien faire
+            return;
         }
 
         const formData = new FormData();
@@ -122,10 +121,9 @@ const FileList = () => {
             });
 
             setFile(null);
-            setUploadSuccess(true); 
+            setUploadSuccess(true);
             fetchFiles();
 
-            // Cacher le message après 3 secondes
             setTimeout(() => {
                 setUploadSuccess(false);
             }, 3000);
@@ -138,29 +136,42 @@ const FileList = () => {
         setFile(e.target.files[0]);
     };
 
+    // Fonction de suppression d'un fichier
+    const handleDelete = async (file_name) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No token found');
+            }
+
+            await axios.delete(`/api/file/${file_name}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            // Mettre à jour la liste des fichiers après suppression
+            setFiles((prevFiles) => prevFiles.filter((file) => file.uuid !== file_name));
+        } catch (error) {
+            console.error('Error deleting file:', error);
+        }
+    };
+
     const sortFiles = (files) => {
         switch (sortOption) {
-            case 'size': // Trier par poids
+            case 'size':
                 return [...files].sort((a, b) => b.size - a.size);
-            case 'name': // Trier par nom
+            case 'name':
                 return [...files].sort((a, b) => a.name.localeCompare(b.name));
-            case 'date': // Trier par date
+            case 'date':
             default:
                 return [...files].sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
         }
     };
 
-    // Fonction de filtrage
     const filteredFiles = files
-        .filter(file => {
-            // Filtrer par nom
-            return file.name.toLowerCase().includes(searchTerm.toLowerCase());
-        })
-        .filter(file => {
-            // Filtrer par format
-            if (selectedFormat === 'all') return true;
-            return file.name.endsWith(`.${selectedFormat}`);
-        });
+        .filter(file => file.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .filter(file => selectedFormat === 'all' || file.name.endsWith(`.${selectedFormat}`));
 
     const handleFormatChange = (e) => {
         setSelectedFormat(e.target.value);
@@ -200,33 +211,37 @@ const FileList = () => {
             {filteredFiles.length === 0 ? (
                 <p>Vous n'avez aucun fichier téléversé.</p>
             ) : (
-              <div className='container-files'>
-                <div className='upload-section'>
-                  <label htmlFor="images" className="drop-container" ref={dropContainerRef}>
-                      <span className="drop-title">Déposer des images ici</span>
-                      ou
-                      <input type="file" id="images" onChange={handleFileChange} />
-                      <button className="upload-button" onClick={handleUpload}>Téléverser</button>
-                  </label>
+                <div className='container-files'>
+                    <div className='upload-section'>
+                        <label htmlFor="images" className="drop-container" ref={dropContainerRef}>
+                            <span className="drop-title">Déposer des images ici</span>
+                            ou
+                            <input type="file" id="images" onChange={handleFileChange} />
+                            <button className="upload-button" onClick={handleUpload}>Téléverser</button>
+                        </label>
+                    </div>
+                    <div className="file-list">
+                        {sortFiles(filteredFiles).map((file, index) => (
+                            <div key={file.uuid} className="file-item">
+                                {file.name.endsWith('.pdf') ? (
+                                    <FontAwesomeIcon icon={faFilePdf} size="3x" />
+                                ) : file.name.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                                    <img src={file.details.url} alt={file.name} width={100} height={100} style={{ objectFit: 'cover' }} />
+                                ) : (
+                                    <FontAwesomeIcon icon={faFile} size="3x" />
+                                )}
+                                <p>{file.name}</p>
+                                <button className="file-list-download-button" onClick={() => handleDownload(file.details.url, file.name)}>
+                                    Télécharger
+                                </button>
+                                {/* Bouton de suppression */}
+                                <button className="file-list-delete-button" onClick={() => handleDelete(file.uuid)}>
+                                    <FontAwesomeIcon icon={faTrashAlt} /> Supprimer
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <div className="file-list">
-                    {sortFiles(filteredFiles).map((file, index) => (
-                        <div key={file.uuid} className="file-item">
-                            {file.name.endsWith('.pdf') ? (
-                                <FontAwesomeIcon icon={faFilePdf} size="3x" />
-                            ) : file.name.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                                <img src={file.details.url} alt={file.name} width={100} height={100} style={{ objectFit: 'cover' }} />
-                            ) : (
-                                <FontAwesomeIcon icon={faFile} size="3x" />
-                            )}
-                            <p>{file.name}</p>
-                            <button onClick={() => handleDownload(file.details.url, file.name)}>
-                                Télécharger
-                            </button>
-                        </div>
-                    ))}
-                </div>
-              </div>
             )}
         </div>
     );

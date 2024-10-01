@@ -4,8 +4,22 @@ const Invoice = require('../models/invoiceModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-const { s3Client } = require('../config/aws');
-const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
+// const { s3Client } = require('../config/aws');
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+
+// Paramètres de configuration pour AWS S3
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.AWS_REGION;
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+
+const s3Client = new S3Client({
+    region: bucketRegion,
+    credentials: {
+        accessKeyId,
+        secretAccessKey
+    }
+});
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 async function passwordHasher(password) {
@@ -20,7 +34,7 @@ async function passwordHasher(password) {
 
 exports.register = async (req, res) => {
     try {
-        const { email, password } = req.body; // Ajoute le rôle dans les paramètres
+        const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ message: 'Email et mot de passe obligatoires' });
         }
@@ -47,9 +61,8 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
         }
 
-
         const token = jwt.sign(
-            { id: user.id}, // Assure-toi que le rôle est bien inclus
+            { id: user.id},
             process.env.SECRET_KEY, 
             { expiresIn: '1h' }
         );
@@ -131,9 +144,10 @@ exports.delete = async (req, res) => {
         }
 
         const files = await File.findAll({ where: { user_id: user.id } });
+
         for (const file of files) {
             const deleteObjectParams = {
-                Bucket: bucketName, // Assurez-vous que bucketName est défini
+                Bucket: bucketName,
                 Key: file.uuid
             };
             await s3Client.send(new DeleteObjectCommand(deleteObjectParams));
@@ -143,7 +157,7 @@ exports.delete = async (req, res) => {
         await user.destroy();
         res.status(200).json({ message: 'Utilisateur et ses fichiers supprimés' });
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ error: 'Erreur lors de la suppression de l\'utilisateur', details: err.message });
     }
 };
 

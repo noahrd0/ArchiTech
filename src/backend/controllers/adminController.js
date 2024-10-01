@@ -69,17 +69,6 @@ exports.statistics = async (req, res) => {
             where: { role: 'admin' }
         });
         
-        // Statistique 6 : Utilisateur avec le plus de fichiers
-        const topUser = await User.findOne({
-            attributes: ['id', 'email'],
-            include: [{
-                model: File,
-                attributes: [[sequelize.fn('COUNT', sequelize.col('files.id')), 'fileCount']]
-            }],
-            group: ['User.id'],
-            order: [[sequelize.literal('fileCount'), 'DESC']],
-            limit: 1
-        });
 
         // Envoyer les résultats
         res.status(200).json({
@@ -88,7 +77,6 @@ exports.statistics = async (req, res) => {
             filesToday,          // Nombre de fichiers téléversés aujourd'hui
             filesPerUser,        // Nombre moyen de fichiers par utilisateur
             adminCount,          // Nombre d'administrateurs
-            topUser: topUser ? topUser.email : 'Aucun utilisateur trouvé' // Utilisateur avec le plus de fichiers
         });
     } catch (err) {
         res.status(400).json({ error: err.message });
