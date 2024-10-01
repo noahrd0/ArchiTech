@@ -11,28 +11,34 @@ function Register() {
   const handleRegister = (e) => {
     e.preventDefault();
 
+    // Vérifie si les mots de passe correspondent
     if (password !== confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
-      return;
+        alert('Les mots de passe ne correspondent pas');
+        return;
     }
 
+    // Envoie une requête d'inscription à l'API
     fetch('/api/user/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
     })
-      .then(response => response.json())
-      .then(data => {
-        if (data.id) {
-          alert('Inscription réussie! Veuillez vous connecter.');
-          navigate('/login');
-        } else {
-          alert('Erreur lors de l\'inscription: ' + (data.message || 'Veuillez réessayer'));
-        }
-      })
-      .catch(error => console.error('Error:', error));
+        .then(response => response.json())
+        .then(data => {
+            // Vérifie si la réponse contient un message d'erreur
+            if (data.message) {
+              alert('Inscription réussie! Veuillez vous connecter.');
+              navigate('/login');
+            } else {
+                alert('Une erreur est survenue. Veuillez réessayer.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue. Veuillez réessayer.');
+        });
   };
 
   return (

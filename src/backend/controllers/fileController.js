@@ -102,8 +102,6 @@ exports.get = async (req, res) => {
 exports.getAdmin = async (req, res) => {
     try {
         user_id = req.params.user_id;
-        console.log(user_id);
-        console.log(req.params);
 
         const file = await File.findOne({ where: { name: req.params.file_name, user_id } });
         if (!file) {
@@ -137,23 +135,36 @@ exports.download = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try {
-        user_id = req.user.id;
-        const file = await File.findOne({ where: { name: req.params.file_name, user_id } });
+        const user_id = req.user.id;
+
+        const file = await File.findOne({ 
+            where: { uuid: req.params.file_name, user_id } 
+        });
+
         if (!file) {
             return res.status(404).json({ message: 'Fichier non trouvé' });
-        } else {
-            const deleteObjectParams = {
-                Bucket: bucketName,
-                Key: file.uuid
-            };
-            await s3Client.send(new DeleteObjectCommand(deleteObjectParams));
-            await file.destroy();
-            res.status(200).json({ message: 'Fichier supprimé' });
         }
+
+        const deleteObjectParams = {
+            Bucket: bucketName,
+            Key: file.uuid 
+        };
+
+        await s3Client.send(new DeleteObjectCommand(deleteObjectParams));
+        await file.destroy();
+
+        res.status(200).json({ message: 'Fichier supprimé avec succès' });
+
     } catch (err) {
-        res.status(400).json(err);
+        console.error('Erreur lors de la suppression du fichier:', err);
+        if (err.name === 'NoSuchKey') {
+            return res.status(404).json({ message: 'Fichier introuvable dans le bucket S3' });
+        } else if (err.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Requête invalide', details: err.errors });
+        }
+        res.status(500).json({ message: 'Erreur serveur lors de la suppression du fichier', error: err.message });
     }
-}
+};
 
 exports.update = async (req, res) => {
     try {

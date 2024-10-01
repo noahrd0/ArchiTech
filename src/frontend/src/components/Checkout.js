@@ -56,7 +56,7 @@ const Checkout = () => {
     };
 
     return (
-        <div className="container">
+        <div className="checkout-container">
             <div className="card">
                 <div className="card-header">
                     <h1>20Go de stokage</h1>
