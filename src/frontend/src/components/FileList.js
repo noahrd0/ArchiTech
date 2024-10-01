@@ -225,18 +225,18 @@ const FileList = () => {
                     </select>
                 </div>
             </div>
+            <div className='upload-section'>
+                <label htmlFor="images" className="drop-container" ref={dropContainerRef}>
+                    <span className="drop-title">Déposer des images ici</span>
+                    ou
+                    <input type="file" id="images" onChange={handleFileChange} />
+                    <button className="upload-button" onClick={handleUpload}>Téléverser</button>
+                </label>
+            </div>
             {filteredFiles.length === 0 ? (
                 <p>Vous n'avez aucun fichier téléversé.</p>
             ) : (
                 <div className='container-files'>
-                    <div className='upload-section'>
-                        <label htmlFor="images" className="drop-container" ref={dropContainerRef}>
-                            <span className="drop-title">Déposer des images ici</span>
-                            ou
-                            <input type="file" id="images" onChange={handleFileChange} />
-                            <button className="upload-button" onClick={handleUpload}>Téléverser</button>
-                        </label>
-                    </div>
                     <div className="file-list">
                         {sortFiles(filteredFiles).map((file, index) => (
                             <div key={file.uuid} className="file-item">
