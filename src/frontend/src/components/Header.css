@@ -117,6 +117,16 @@
   background-color: #f0f0f0;
 }
 
+.dropdown-content .delete-account {
+  background-color: #FF4C4C;
+  color: #FFF;
+}
+
+.dropdown-content .delete-account:hover {
+  background-color: #D32F2F ;
+  color: #FFF;
+}
+
 .logo img{
   width: 50px;
 }

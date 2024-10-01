@@ -6,10 +6,11 @@ import Auth from './components/Auth';
 import Header from './components/Header';
 import FileList from './components/FileList';
 import { AuthProvider } from './context/AuthContext';
-import  AdminBoard  from './components/adminBoard';
+import AdminBoard from './components/adminBoard';
 import UserFiles from './components/AdminUserFiles';
 import Checkout from './components/Checkout';
 import Invoice from './components/Invoice';
+import Home from './components/Home';  // Importer le composant Home
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
           <Header />
           <main>
             <Routes>
+              {/* Route racine pour rediriger selon l'état d'authentification */}
+              <Route path="/" element={<Home />} />
+
               <Route path="/connexion" element={<Auth />} />
               <Route path="/list" element={<FileList />} />
               <Route path="/admin" element={<AdminBoard />} />
