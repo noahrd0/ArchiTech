@@ -152,7 +152,6 @@ exports.delete = async (req, res) => {
         }
 
         const files = await File.findAll({ where: { user_id: user.id } });
-
         for (const file of files) {
             const deleteObjectParams = {
                 Bucket: bucketName,
@@ -160,6 +159,11 @@ exports.delete = async (req, res) => {
             };
             await s3Client.send(new DeleteObjectCommand(deleteObjectParams));
             await file.destroy();
+        }
+
+        const invoices = await Invoice.findAll({ where: { user_id: user.id } });
+        for (const invoice of invoices) {
+            await invoice.destroy();
         }
 
         await sendEmail(
@@ -170,7 +174,6 @@ exports.delete = async (req, res) => {
 
         const admins = await User.findAll({ where: { role: 'admin' } });
         const adminEmails = admins.map(admin => admin.email);
-
         const adminEmailPromises = adminEmails.map(email => 
             sendEmail(
                 email,
@@ -182,7 +185,7 @@ exports.delete = async (req, res) => {
         await Promise.all(adminEmailPromises);
         await user.destroy();
 
-        res.status(200).json({ message: 'Utilisateur et ses fichiers supprimés' });
+        res.status(200).json({ message: 'Utilisateur, ses fichiers et factures supprimés avec succès' });
     } catch (err) {
         res.status(400).json({ error: 'Erreur lors de la suppression de l\'utilisateur', details: err.message });
     }
