@@ -24,7 +24,7 @@ const s3Client = new S3Client({
 });
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-async function passwordHasher(password) {
+async function passwordHasher(res, password) {
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
     if (!passwordRegex.test(password)) {
         return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule et un chiffre' });
@@ -46,7 +46,7 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: 'Email déjà utilisé' });
         }
 
-        const user = await User.create({ email, password: await passwordHasher(password)});
+        const user = await User.create({ email, password: await passwordHasher(res, password) });
 
         // Envoyer un email de bienvenue
         await sendEmail(
@@ -57,7 +57,7 @@ exports.register = async (req, res) => {
 
         res.status(201).json(user);
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ message: 'Erreur lors de l\'inscription' });
     }
 }
 

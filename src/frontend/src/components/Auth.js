@@ -77,7 +77,7 @@ function Auth() {
     })
       .then(response => response.json())
       .then(data => {
-        if (data.message) {
+        if (!data.message) {
           Swal.fire({
             title: 'Succès',
             text: 'Inscription réussie! Veuillez vous connecter.',
@@ -88,7 +88,7 @@ function Auth() {
         } else {
           Swal.fire({
             title: 'Erreur',
-            text: 'Une erreur est survenue. Veuillez réessayer.',
+            text: data.message || 'Veuillez réessayer',
             icon: 'error',
             confirmButtonText: 'Ok'
           });
