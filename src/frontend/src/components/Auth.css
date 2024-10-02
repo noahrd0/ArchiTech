@@ -1,3 +1,6 @@
+body {
+  overflow-y: hidden;
+}
 .auth-container {
   display: flex;
   align-items: center;
@@ -21,7 +24,7 @@
 
 .auth-container .picture-container .background-image{
   width: 100%;
-  height: calc(100vh - 65px);
+  height: 100vh;
   filter: brightness(0.7);
 }
 
