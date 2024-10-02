@@ -24,7 +24,7 @@ const AuthProvider = ({ children }) => {
         })
           .then(response => response.json())
           .then(data => {
-            setUserRole(data.role); // Assurez-vous que l'API retourne le rôle
+            setUserRole(data.role);
           });
       } catch (error) {
         console.error('Erreur lors du décodage du token', error);

@@ -5,16 +5,15 @@ const sendEmail = async (to, subject, text) => {
     try {
         const transporter = nodemailer.createTransport({
             host: 'smtp-relay.sendinblue.com',
-            port: 587, // ou 465 pour SSL
-            secure: false, // true pour port 465, false pour le port 587
+            port: 587, 
+            secure: false, 
             auth: {
-                user: process.env.SENDINBLUE_USER, // Ton adresse email ou identifiant Sendinblue
-                pass: process.env.SENDINBLUE_API_KEY, // Ta clé API Sendinblue
+                user: process.env.SENDINBLUE_USER, 
+                pass: process.env.SENDINBLUE_API_KEY, 
             },
         });
-
         const mailOptions = {
-            from: process.env.SENDINBLUE_EMAIL, // Ton adresse email
+            from: process.env.SENDINBLUE_EMAIL,
             to,
             subject,
             text,

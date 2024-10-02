@@ -1,8 +1,8 @@
-// src/components/Auth.js
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import fond from '../img/monochromatic-urban-minimal-landscape.jpg';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 import './Auth.css';
 
 function Auth() {
@@ -26,12 +26,31 @@ function Auth() {
       .then(data => {
         if (data.token) {
           login(data.token);
+          Swal.fire({
+            title: 'Succès',
+            text: 'Connexion réussie!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
           navigate('/list');
         } else {
-          alert('Échec de la connexion: ' + (data.message || 'Veuillez réessayer'));
+          Swal.fire({
+            title: 'Échec de la connexion',
+            text: data.message || 'Veuillez réessayer',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
         }
       })
-      .catch(error => console.error('Erreur:', error));
+      .catch(error => {
+        console.error('Erreur:', error);
+        Swal.fire({
+          title: 'Erreur',
+          text: 'Une erreur est survenue. Veuillez réessayer.',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      });
   };
 
   const handleRegister = (e) => {
@@ -39,7 +58,12 @@ function Auth() {
 
     // Vérifie si les mots de passe correspondent
     if (password !== confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
+      Swal.fire({
+        title: 'Erreur',
+        text: 'Les mots de passe ne correspondent pas',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
       return;
     }
 
@@ -53,17 +77,31 @@ function Auth() {
     })
       .then(response => response.json())
       .then(data => {
-        // Vérifie si la réponse contient un message d'erreur
         if (data.message) {
-          alert('Inscription réussie! Veuillez vous connecter.');
+          Swal.fire({
+            title: 'Succès',
+            text: 'Inscription réussie! Veuillez vous connecter.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
           setIsLogin(true); // Passer à la page de connexion après l'inscription
         } else {
-          alert('Une erreur est survenue. Veuillez réessayer.');
+          Swal.fire({
+            title: 'Erreur',
+            text: 'Une erreur est survenue. Veuillez réessayer.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
         }
       })
       .catch(error => {
-        console.error('Error:', error);
-        alert('Une erreur est survenue. Veuillez réessayer.');
+        console.error('Erreur:', error);
+        Swal.fire({
+          title: 'Erreur',
+          text: 'Une erreur est survenue. Veuillez réessayer.',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
       });
   };
 

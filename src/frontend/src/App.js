@@ -10,7 +10,7 @@ import AdminBoard from './components/adminBoard';
 import UserFiles from './components/AdminUserFiles';
 import Checkout from './components/Checkout';
 import Invoice from './components/Invoice';
-import Home from './components/Home';  // Importer le composant Home
+import Home from './components/Home'; 
 
 function App() {
   return (
