@@ -22,7 +22,6 @@ function App() {
             <Routes>
               {/* Route racine pour rediriger selon l'état d'authentification */}
               <Route path="/" element={<Home />} />
-
               <Route path="/connexion" element={<Auth />} />
               <Route path="/list" element={<FileList />} />
               <Route path="/admin" element={<AdminBoard />} />
